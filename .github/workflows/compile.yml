@@ -74,74 +74,6 @@ jobs:
             gawk
 
 
-      # glibc 依赖库编译阶段
-      # - name: Compile GMP (required for glibc)
-      #   if: inputs.libc_type == 'glibc'
-      #   run: |
-      #     GMP_VERSION=6.3.0
-      #     echo "GMP_VERSION=${GMP_VERSION}" >> $GITHUB_ENV
-      #
-      #     # Download GMP source
-      #     wget https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.xz
-      #     tar xJf gmp-${GMP_VERSION}.tar.xz
-      #
-      #     # Configure and build
-      #     mkdir -p ${INSTALL_DIR}
-      #     cd gmp-${GMP_VERSION}
-      #     ./configure --prefix=${INSTALL_DIR}/gmp \
-      #       --disable-shared \
-      #       --enable-static
-      #     make -j$(nproc)
-      #     make install
-      #
-      #     echo "GMP installed successfully"
-      #     ls -la ${INSTALL_DIR}/gmp/lib/
-      #
-      # - name: Compile MPFR (required for glibc)
-      #   if: inputs.libc_type == 'glibc'
-      #   run: |
-      #     MPFR_VERSION=4.2.2
-      #     echo "MPFR_VERSION=${MPFR_VERSION}" >> $GITHUB_ENV
-      #
-      #     # Download MPFR source
-      #     wget https://www.mpfr.org/mpfr-current/mpfr-${MPFR_VERSION}.tar.gz
-      #     tar xzf mpfr-${MPFR_VERSION}.tar.gz
-      #
-      #     # Configure and build with GMP
-      #     cd mpfr-${MPFR_VERSION}
-      #     ./configure --prefix=${INSTALL_DIR}/mpfr \
-      #       --with-gmp=${INSTALL_DIR}/gmp \
-      #       --disable-shared \
-      #       --enable-static
-      #     make -j$(nproc)
-      #     make install
-      #
-      #     echo "MPFR installed successfully"
-      #     ls -la ${INSTALL_DIR}/mpfr/lib/
-      #
-      # - name: Compile MPC (required for glibc)
-      #   if: inputs.libc_type == 'glibc'
-      #   run: |
-      #     MPC_VERSION=1.3.1
-      #     echo "MPC_VERSION=${MPC_VERSION}" >> $GITHUB_ENV
-      #
-      #     # Download MPC source
-      #     wget https://ftp.gnu.org/gnu/mpc/mpc-${MPC_VERSION}.tar.gz
-      #     tar xzf mpc-${MPC_VERSION}.tar.gz
-      #
-      #     # Configure and build with GMP and MPFR
-      #     cd mpc-${MPC_VERSION}
-      #     ./configure --prefix=${INSTALL_DIR}/mpc \
-      #       --with-gmp=${INSTALL_DIR}/gmp \
-      #       --with-mpfr=${INSTALL_DIR}/mpfr \
-      #       --disable-shared \
-      #       --enable-static
-      #     make -j$(nproc)
-      #     make install
-      #
-      #     echo "MPC installed successfully"
-      #     ls -la ${INSTALL_DIR}/mpc/lib/
-
       # 主库编译阶段
       - name: Compile musl
         if: inputs.libc_type == 'musl'
@@ -190,18 +122,14 @@ jobs:
           # Create build directory
           mkdir build && cd build
 
-          # Export library paths for dependencies
-          # export PATH=${INSTALL_DIR}/gmp/bin:${INSTALL_DIR}/mpfr/bin:${INSTALL_DIR}/mpc/bin:$PATH
-          # export LDFLAGS="-L${INSTALL_DIR}/gmp/lib -L${INSTALL_DIR}/mpfr/lib -L${INSTALL_DIR}/mpc/lib"
-          # export CPPFLAGS="-I${INSTALL_DIR}/gmp/include -I${INSTALL_DIR}/mpfr/include -I${INSTALL_DIR}/mpc/include"
-
           # Configure with math library support (native build on matched architecture runner)
           ../configure \
             --prefix=/usr \
             --disable-profile \
             --disable-werror \
             --enable-add-ons \
-            --without-cvs
+            --without-cvs \
+            --disable-sanity-checks
 
           # Compile with all components including math library
           make -j$(nproc) PARALLELMFLAGS="-j$(nproc)"
@@ -281,7 +209,4 @@ jobs:
           if [ "${{ inputs.libc_type }}" = "glibc" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Dependencies:**" >> $GITHUB_STEP_SUMMARY
-            # echo "- GMP: ${GMP_VERSION:-6.3.0}" >> $GITHUB_STEP_SUMMARY
-            # echo "- MPFR: ${MPFR_VERSION:-4.2.1}" >> $GITHUB_STEP_SUMMARY
-            # echo "- MPC: ${MPC_VERSION:-1.3.1}" >> $GITHUB_STEP_SUMMARY
           fi
