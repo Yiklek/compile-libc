@@ -100,7 +100,7 @@ jobs:
       - name: Compile MPFR (required for glibc)
         if: inputs.libc_type == 'glibc'
         run: |
-          MPFR_VERSION=4.2.1
+          MPFR_VERSION=4.2.2
           echo "MPFR_VERSION=${MPFR_VERSION}" >> $GITHUB_ENV
 
           # Download MPFR source
