@@ -201,6 +201,7 @@ jobs:
             --disable-profile \
             --disable-werror \
             --enable-add-ons \
+            --without-gmp \
             --without-cvs
 
           # Compile with all components including math library
