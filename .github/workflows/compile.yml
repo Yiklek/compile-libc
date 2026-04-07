@@ -71,10 +71,7 @@ jobs:
             texinfo \
             bison \
             flex \
-            gawk \
-            wc \
-            sed \
-            grep
+            gawk
 
       - name: Setup cross-compilation for aarch64
         if: inputs.target_arch == 'aarch64'
