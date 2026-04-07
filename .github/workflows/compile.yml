@@ -121,15 +121,14 @@ jobs:
 
           # Create build directory
           mkdir build && cd build
-
+          CPPFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0"
           # Configure with math library support (native build on matched architecture runner)
           ../configure \
             --prefix=/usr \
             --disable-profile \
             --disable-werror \
             --enable-add-ons \
-            --without-cvs \
-            --disable-sanity-checks
+            --without-cvs
 
           # Compile with all components including math library
           make -j$(nproc) PARALLELMFLAGS="-j$(nproc)"
